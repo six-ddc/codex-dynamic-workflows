@@ -20,6 +20,8 @@ export interface RunnerConfig {
   geminiCommand?: string;
   /** pi CLI executable, when overridden (`--pi-command`). */
   piCommand?: string;
+  /** agy CLI executable, when overridden (`--agy-command`). */
+  agyCommand?: string;
   /** Backend provider name (`--provider`), for the pi backend. */
   provider?: string;
   /** Custom OpenAI/Anthropic-compatible endpoint (`--base-url`), for the pi backend. */
