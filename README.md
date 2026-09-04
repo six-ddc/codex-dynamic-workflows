@@ -203,6 +203,13 @@ Sample scripts you run by **path** (`codex-workflow run examples/<file>`).
 - `code-review.js` — Claude Code's built-in hidden `code-review` workflow. **Reference only**: it was
   extracted from the compiled client with unresolved `${…}` template placeholders, so it does not
   parse/run; it's included to document the find → verify → synthesize architecture.
+- `multi-agent-workflow/` — directory containing a self-contained end-to-end issue resolver.
+  Run `bash examples/multi-agent-workflow/setup.sh` once, then
+  `bun codex-workflow run examples/multi-agent-workflow/workflow.js --args '{"tracker":"gh","issueId":123}'`.
+  Includes 10 phases (Debrief → Plan → Review → Plan Impl → Review → Implement+Unit → E2E → Lint+CI → Audit → PR),
+  three human-approval gates, seven vendored subagents under `agents/` (4 reused `rgi-lens-*` lenses +
+  `rgi-lens-scope` + `rgi-lens-dod-coverage` + `multi-agent-auditor`), and an Orca integration guide
+  (`ORCA.md`) for running N parallel issue resolutions inside Orca Tasks UI panes.
 
 ## Viewer
 
