@@ -649,6 +649,9 @@ async function runBunChild(runnerPath: string, options: BunChildOptions): Promis
     env: process.env,
     stdio: "pipe",
   });
+  // Decode incrementally so multibyte characters can span pipe chunks.
+  child.stdout.setEncoding("utf8");
+  child.stderr.setEncoding("utf8");
 
   return new Promise<unknown>((resolve, reject) => {
     let settled = false;
@@ -729,10 +732,10 @@ async function runBunChild(runnerPath: string, options: BunChildOptions): Promis
       settle(new WorkflowInputError(`Bun workflow failed: ${detail}`));
     });
 
-    child.stdout.on("data", (chunk: Buffer) => {
+    child.stdout.on("data", (chunk: string) => {
       armIdleTimer();
       if (settled) return;
-      stdoutBuffer += chunk.toString("utf8");
+      stdoutBuffer += chunk;
       let index: number;
       while ((index = stdoutBuffer.indexOf("\n")) >= 0) {
         const line = stdoutBuffer.slice(0, index);
@@ -751,9 +754,8 @@ async function runBunChild(runnerPath: string, options: BunChildOptions): Promis
       }
     });
 
-    child.stderr.on("data", (chunk: Buffer) => {
+    child.stderr.on("data", (text: string) => {
       armIdleTimer();
-      const text = chunk.toString("utf8");
       // Keep only a bounded tail for the failure message; chatty stderr must not grow without limit.
       stderrBuffer = (stderrBuffer + text).slice(-MAX_CHILD_STDERR_TAIL_BYTES);
       for (const line of text.split(/\r?\n/)) {
